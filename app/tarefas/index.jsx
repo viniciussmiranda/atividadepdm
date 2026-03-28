@@ -4,12 +4,19 @@ import {
   Alert,
   Button,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { adicionarTarefa, getTarefas } from "@/back4app";
+import {
+  adicionarTarefa,
+  atualizarTarefa,
+  deletarTarefa,
+  getTarefas,
+} from "@/back4app";
 
 export default function TarefasPage() {
   const queryClient = useQueryClient();
@@ -17,28 +24,66 @@ export default function TarefasPage() {
     queryKey: ["tarefas"],
     queryFn: getTarefas,
   });
-  const mutation = useMutation({
+
+  const mutationAdicionar = useMutation({
     mutationFn: adicionarTarefa,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tarefas"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tarefas"] }),
   });
+
+  const mutationAtualizar = useMutation({
+    mutationFn: atualizarTarefa,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tarefas"] }),
+  });
+
+  const mutationDeletar = useMutation({
+    mutationFn: deletarTarefa,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tarefas"] }),
+  });
+
   const [descricao, setDescricao] = useState("");
 
-  async function handleAdicionarTarefaPress() {
+  function handleAdicionarTarefaPress() {
     if (descricao.trim() === "") {
       Alert.alert("Descrição inválida", "Preencha a descrição da tarefa", [
-        { text: "OK", onPress: () => {} },
+        { text: "OK" },
       ]);
       return;
     }
-    mutation.mutate({ descricao });
+    mutationAdicionar.mutate({ descricao });
     setDescricao("");
   }
 
+  function handleToggleConcluida(tarefa) {
+    mutationAtualizar.mutate({
+      objectId: tarefa.objectId,
+      concluida: !tarefa.concluida,
+    });
+  }
+
+  function handleDeletar(tarefa) {
+    Alert.alert(
+      "Confirmar exclusão",
+      `Deseja deletar "${tarefa.descricao}"?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Deletar",
+          style: "destructive",
+          onPress: () => mutationDeletar.mutate(tarefa.objectId),
+        },
+      ]
+    );
+  }
+
+  const isPending =
+    isFetching ||
+    mutationAdicionar.isPending ||
+    mutationAtualizar.isPending ||
+    mutationDeletar.isPending;
+
   return (
     <View style={styles.container}>
-      {(isFetching || mutation.isPending) && <ActivityIndicator size="large" />}
+      {isPending && <ActivityIndicator size="large" />}
       <TextInput
         style={styles.input}
         placeholder="Descrição"
@@ -48,17 +93,27 @@ export default function TarefasPage() {
       <Button
         title="Adicionar Tarefa"
         onPress={handleAdicionarTarefaPress}
-        disabled={mutation.isPending}
+        disabled={mutationAdicionar.isPending}
       />
       <View style={styles.hr} />
       <View style={styles.tasksContainer}>
         {data?.map((t) => (
-          <Text
-            key={t.objectId}
-            style={t.concluida && styles.strikethroughText}
-          >
-            {t.descricao}
-          </Text>
+          <View key={t.objectId} style={styles.taskRow}>
+            <Switch
+              value={!!t.concluida}
+              onValueChange={() => handleToggleConcluida(t)}
+              disabled={mutationAtualizar.isPending}
+            />
+            <Text style={[styles.taskText, t.concluida && styles.strikethroughText]}>
+              {t.descricao}
+            </Text>
+            <TouchableOpacity
+              onPress={() => handleDeletar(t)}
+              disabled={mutationDeletar.isPending}
+            >
+              <Text style={styles.deleteBtn}>🗑️</Text>
+            </TouchableOpacity>
+          </View>
         ))}
       </View>
     </View>
@@ -66,30 +121,16 @@ export default function TarefasPage() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 10,
-  },
-  tasksContainer: {
-    paddingLeft: 15,
-  },
-  input: {
-    borderColor: "black",
-    borderWidth: 1,
-    width: "90%",
-    marginBottom: 5,
-  },
-  hr: {
-    height: 1,
-    backgroundColor: "black",
-    width: "95%",
-    marginVertical: 10,
-  },
+  container: { flex: 1, alignItems: "center", padding: 10 },
+  tasksContainer: { width: "100%", paddingLeft: 10 },
+  taskRow: { flexDirection: "row", alignItems: "center", marginVertical: 6, gap: 8 },
+  taskText: { flex: 1, fontSize: 16 },
+  input: { borderColor: "black", borderWidth: 1, width: "90%", marginBottom: 5, padding: 4 },
+  hr: { height: 1, backgroundColor: "black", width: "95%", marginVertical: 10 },
   strikethroughText: {
-    textDecorationLine: "line-through", // Key property for strikethrough
-    textDecorationStyle: "solid", // Optional: Style of the line
-    textDecorationColor: "red", // Optional: Color of the line (iOS only)
-    // Other styles like fontSize, fontWeight, color can also be applied
+    textDecorationLine: "line-through",
+    textDecorationColor: "red",
+    color: "#999",
   },
+  deleteBtn: { fontSize: 20, padding: 4 },
 });
