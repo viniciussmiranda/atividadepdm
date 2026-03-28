@@ -47,14 +47,15 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "9858e7ed-da74-4f2b-8fa2-f07544205e7d"
+        "projectId": "955cafd2-0fbf-417f-b724-aa75c37b2965"
       }
     },
+    "owner": "viniciussmiranda",
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/9858e7ed-da74-4f2b-8fa2-f07544205e7d"
+      "url": "https://u.expo.dev/955cafd2-0fbf-417f-b724-aa75c37b2965"
     }
   }
 }
