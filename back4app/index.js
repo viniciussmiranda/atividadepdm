@@ -16,11 +16,19 @@ export async function getTarefas() {
 }
 
 export async function adicionarTarefa(novaTarefa) {
-  const response = await axios.post(
-    urlBase,
-    { descricao: novaTarefa.descricao, concluida: false },
-    { headers: headersJson }
-  );
+  const body = {
+    descricao: novaTarefa.descricao,
+    concluida: false,
+  };
+
+  if (novaTarefa.dataDeExpiracao) {
+    body.dataDeExpiracao = {
+      __type: "Date",
+      iso: new Date(novaTarefa.dataDeExpiracao).toISOString(),
+    };
+  }
+
+  const response = await axios.post(urlBase, body, { headers: headersJson });
   return response.data;
 }
 
