@@ -1,3 +1,10 @@
+import {
+  adicionarTarefa,
+  atualizarTarefa,
+  getTarefas,
+} from "@/back4app";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -10,15 +17,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  adicionarTarefa,
-  atualizarTarefa,
-  deletarTarefa,
-  getTarefas,
-} from "@/back4app";
 
 export default function TarefasPage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { data, isFetching } = useQuery({
     queryKey: ["tarefas"],
@@ -32,11 +33,6 @@ export default function TarefasPage() {
 
   const mutationAtualizar = useMutation({
     mutationFn: atualizarTarefa,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tarefas"] }),
-  });
-
-  const mutationDeletar = useMutation({
-    mutationFn: deletarTarefa,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tarefas"] }),
   });
 
@@ -60,26 +56,10 @@ export default function TarefasPage() {
     });
   }
 
-  function handleDeletar(tarefa) {
-    Alert.alert(
-      "Confirmar exclusão",
-      `Deseja deletar "${tarefa.descricao}"?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Deletar",
-          style: "destructive",
-          onPress: () => mutationDeletar.mutate(tarefa.objectId),
-        },
-      ]
-    );
-  }
-
   const isPending =
     isFetching ||
     mutationAdicionar.isPending ||
-    mutationAtualizar.isPending ||
-    mutationDeletar.isPending;
+    mutationAtualizar.isPending;
 
   return (
     <View style={styles.container}>
@@ -104,14 +84,10 @@ export default function TarefasPage() {
               onValueChange={() => handleToggleConcluida(t)}
               disabled={mutationAtualizar.isPending}
             />
-            <Text style={[styles.taskText, t.concluida && styles.strikethroughText]}>
-              {t.descricao}
-            </Text>
-            <TouchableOpacity
-              onPress={() => handleDeletar(t)}
-              disabled={mutationDeletar.isPending}
-            >
-              <Text style={styles.deleteBtn}>🗑️</Text>
+            <TouchableOpacity onPress={() => router.push(`/tarefas/${t.objectId}`)}>
+              <Text style={[styles.taskText, t.concluida && styles.strikethroughText]}>
+                {t.descricao}
+              </Text>
             </TouchableOpacity>
           </View>
         ))}
@@ -132,5 +108,4 @@ const styles = StyleSheet.create({
     textDecorationColor: "red",
     color: "#999",
   },
-  deleteBtn: { fontSize: 20, padding: 4 },
 });

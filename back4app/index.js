@@ -37,3 +37,12 @@ export async function deletarTarefa(objectId) {
   const response = await axios.delete(`${urlBase}/${objectId}`, { headers });
   return response.data;
 }
+
+export async function atualizarDescricao({ objectId, descricao }) {
+  const response = await axios.put(
+    `${urlBase}/${objectId}`,
+    { descricao },
+    { headers: headersJson }
+  );
+  return response.data;
+}
