@@ -1,15 +1,15 @@
-import { atualizarDescricao, deletarTarefa, getTarefas } from "@/back4app";
+import { atualizarDescricao, deletarTarefa, getTarefas } from "@/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Button,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Alert,
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 
 export default function EditarTarefaPage() {

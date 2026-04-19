@@ -2,7 +2,7 @@ import {
   adicionarTarefa,
   atualizarTarefa,
   getTarefas,
-} from "@/back4app";
+} from "@/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useState } from "react";
