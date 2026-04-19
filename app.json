@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "expo-01",
-    "slug": "expo-01",
+    "slug": "tarefas",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -47,7 +47,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "955cafd2-0fbf-417f-b724-aa75c37b2965"
+        "projectId": "6fbabd5f-f65d-420a-b139-10cbdae47c4d"
       }
     },
     "owner": "viniciussmiranda",
