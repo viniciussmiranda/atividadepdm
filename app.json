@@ -3,6 +3,7 @@
     "name": "expo-01",
     "slug": "tarefas",
     "version": "1.0.0",
+    "owner": "atividadespdmviniciusmiranda",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "expo01",
